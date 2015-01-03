@@ -1,3 +1,5 @@
+module EchoNest
+
 using Requests
 using JSON
 using DataStructures
@@ -37,6 +39,10 @@ function sortDict(d::Dict)
         o[i] = d[i]
     end
     return o
+end
+
+function setAPIkey(key::String)
+    global API_KEY = key
 end
 
 function getsessioninfo()
@@ -154,3 +160,4 @@ function genre(method::String, options::Dict)
     return r
 end
 
+end     # module end
