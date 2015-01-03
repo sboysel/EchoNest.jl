@@ -22,6 +22,14 @@ METHODS_DICT = Dict("artist" => ["biographies", "blogs", "familiarity",
                 "song" => ["search", "profile"],
                 "track" =>["profile", "upload"])
 
+RESPONSE_CODES = Dict(-1 => "Unknown Error",
+                        0 => "Success1Missing",
+                        1 => "Invalid API Key",
+                        2 => "This API key is not allowed to call this method",
+                        3 => "Rate Limit Exceeded",
+                        4 => "Missing Parameter",
+                        5 => "Invalid Parameter")
+
 # buildQuery base method
 function buildQuery(query_type::String, method::String, name::String, options::Dict)
     if query_type in(keys(METHODS_DICT)) == false
