@@ -103,6 +103,22 @@ function buildQuery(query_type::String, method::String, options::Dict)
     return BASE_URL * query_type * "/" * method * "?api_key=" * API_KEY * opts 
 end
 
+# buildQuerySongs base method
+function buildQuerySongs(query_type::String, method::String, title::String, options::Dict)
+    if query_type in(keys(METHODS_DICT)) == false
+        error("query_type must be artist, genre, song, or track")
+    end
+    if method in(METHODS_DICT[query_type]) == false
+        error("method must be one of the following: ", METHODS_DICT[query_type])
+    end
+    title = "&title=" * replace(title, " ", "+")
+    opts = ""
+    for key in keys(options)
+       opts = opts * "&" * string(key) * "=" * string(options[key])
+    end
+    return BASE_URL * query_type * "/" * method * "?api_key=" * API_KEY * title * opts 
+end
+
 
 # artist base method (query method, name, options dicitonary)
 function artist(method::String, name::String, options::Dict)
@@ -155,6 +171,14 @@ end
 # genre method for passing without a name (query method, options)
 function genre(method::String, options::Dict)
     q = buildQuery("genre", method, options)
+    r = JSON.parse(IOBuffer(Requests.get(q).data))["response"]
+    println(r["status"]["message"])
+    return r
+end
+
+# song base method (query method, name, options dicitonary)
+function song(method::String, title::String, options::Dict)
+    q = buildQuerySongs("song", method, title, options)
     r = JSON.parse(IOBuffer(Requests.get(q).data))["response"]
     println(r["status"]["message"])
     return r
