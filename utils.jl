@@ -1,5 +1,6 @@
 using Requests
 using JSON
+using DataStructures
 
 API_KEY = "JOCUGCFQZH2MXLEDN" 
 CONSUMER_KEY = "b4546780794ccae85068d2fd6c472c73"
@@ -24,6 +25,23 @@ RESPONSE_CODES = Dict(-1 => "Unknown Error",
                         3 => "Rate Limit Exceeded",
                         4 => "Missing Parameter",
                         5 => "Invalid Parameter")
+
+function getartistid(name::String)
+    r = artist("profile", name)
+    return r["artist"]["id"]
+end
+
+function sortDict(d::Dict)
+    o = OrderedDict
+    for i in sort(collect(keys(d)))
+        o[i] = d[i]
+    end
+    return o
+end
+
+function getsessioninfo()
+    return sortDict(Requests.get(buildQuery("artist", "songs", "")).headers)
+end
 
 # buildQuery base method
 function buildQuery(query_type::String, method::String, name::String, options::Dict)
@@ -110,10 +128,6 @@ function artist(method::String, name::String, options::Dict)
     r = JSON.parse(IOBuffer(Requests.get(q).data))["response"]
     println(r["status"]["message"])
     return r 
-end
-
-function getartistid(name::String)
-    return artist("profile", name)["response"]["artist"]["id"]
 end
 
 # genre base method (query method, name, options dicitonary)
