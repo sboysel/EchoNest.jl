@@ -14,6 +14,7 @@ ARTIST_LICENSES = ["echo-source", "all-rights-reserved", "cc-by-sa",
 # ARTIST_LICENSES[rand(1:end)]
 
 TEST_ARTIST = "circa survive"
+TEST_GENRE = "polka"
 
 test1 = artist("biographies", TEST_ARTIST)
 test2 = artist("blogs", TEST_ARTIST)
@@ -36,3 +37,8 @@ test17 = artist("twitter", TEST_ARTIST)
 test18 = artist("urls", TEST_ARTIST)
 test19 = artist("video", TEST_ARTIST)
 
+test20 = genre("artists", TEST_GENRE)
+test21 = genre("list", Dict("bucket" => "urls"))
+test22 = genre("profile", Dict("bucket" => "description"))
+test23 = genre("search", TEST_GENRE, Dict("bucket" => "description", "results" => "50"))
+test24 = genre("similar", TEST_GENRE, Dict("bucket" => "urls", "results" => "10"))
