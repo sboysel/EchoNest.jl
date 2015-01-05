@@ -4,6 +4,13 @@ using Requests
 using JSON
 using DataStructures
 
+export getartistid, getsessioninfo, setAPIkey, artist, 
+        genre, song
+
+### BEGIN CONF ###
+# Eventually move conf info to conf.jl:
+# include("conf.jl")
+
 API_KEY = "JOCUGCFQZH2MXLEDN" 
 CONSUMER_KEY = "b4546780794ccae85068d2fd6c472c73"
 SHARED_SECRET = "WqeyUj33Q92QcKU4uklKlA"
@@ -28,6 +35,8 @@ RESPONSE_CODES = Dict(-1 => "Unknown Error",
                         4 => "Missing Parameter",
                         5 => "Invalid Parameter")
 
+### END CONF ###
+
 function getartistid(name::String)
     r = artist("profile", name)
     return r["artist"]["id"]
@@ -42,11 +51,40 @@ function sortDict(d::Dict)
 end
 
 function setAPIkey(key::String)
-    global API_KEY = key
+    #global API_KEY = key
+    exp = "API_KEY = " * key
+    if isfile("conf.jl")
+        include("conf.jl")
+    else
+        f = open("conf.jl", "w")
+        write(f, exp)
+        close(f)
+        include("conf.jl")
+    end
 end
 
 function getsessioninfo()
     return sortDict(Requests.get(buildQuery("artist", "songs", "")).headers)
+end
+
+function getdocs(api::String, method::String)
+    BASE_URL_DOC = "http://developer.echonest.com/docs/v4/"
+    if api = "overview"
+        error("Overview API documentation includes no specific query methods.")
+        return BASE_URL_DOC * "index.html"
+    else
+        return BASE_URL_DOC * api * ".html#" * method
+    end
+end
+
+function getdocs(api::String)
+    BASE_URL_DOC = "http://developer.echonest.com/docs/v4/"
+    if api = "overview"
+        error("Overview API documentation includes no specific query methods.")
+        return BASE_URL_DOC * "index.html"
+    else
+        return BASE_URL_DOC * api * ".html"
+    end
 end
 
 # buildQuery base method
@@ -103,6 +141,22 @@ function buildQuery(query_type::String, method::String, options::Dict)
     return BASE_URL * query_type * "/" * method * "?api_key=" * API_KEY * opts 
 end
 
+# buildQueryArtist id method
+function buildQueryArtist(query_type::String, method::String, id::String, options::Dict)
+    if query_type in(keys(METHODS_DICT)) == false
+        error("query_type must be artist, genre, song, or track")
+    end
+    if method in(METHODS_DICT[query_type]) == false
+        error("method must be one of the following: ", METHODS_DICT[query_type])
+    end
+    id = "&id=" * replace(id, " ", "+")
+    opts = ""
+    for key in keys(options)
+       opts = opts * "&" * string(key) * "=" * string(options[key])
+    end
+    return BASE_URL * query_type * "/" * method * "?api_key=" * API_KEY * id * opts 
+end
+
 # buildQuerySongs base method
 function buildQuerySongs(query_type::String, method::String, title::String, options::Dict)
     if query_type in(keys(METHODS_DICT)) == false
@@ -118,6 +172,35 @@ function buildQuerySongs(query_type::String, method::String, title::String, opti
     end
     return BASE_URL * query_type * "/" * method * "?api_key=" * API_KEY * title * opts 
 end
+
+# buildQuerySongs id method
+function buildQuerySongs(query_type::String, method::String, id::String, options::Dict)
+    if query_type in(keys(METHODS_DICT)) == false
+        error("query_type must be artist, genre, song, or track")
+    end
+    if method in(METHODS_DICT[query_type]) == false
+        error("method must be one of the following: ", METHODS_DICT[query_type])
+    end
+    id = "&id=" * replace(id, " ", "+")
+    opts = ""
+    for key in keys(options)
+       opts = opts * "&" * string(key) * "=" * string(options[key])
+    end
+    return BASE_URL * query_type * "/" * method * "?api_key=" * API_KEY * id * opts 
+end
+
+# buildQuerySongs id method (no options dictionary)
+function buildQuerySongs(query_type::String, method::String, id::String)
+    if query_type in(keys(METHODS_DICT)) == false
+        error("query_type must be artist, genre, song, or track")
+    end
+    if method in(METHODS_DICT[query_type]) == false
+        error("method must be one of the following: ", METHODS_DICT[query_type])
+    end
+    id = "&id=" * replace(id, " ", "+")
+    return BASE_URL * query_type * "/" * method * "?api_key=" * API_KEY * id 
+end
+
 
 
 # artist base method (query method, name, options dicitonary)
@@ -145,8 +228,24 @@ function artist(method::String)
 end
 
 # artist method for passing a method with options (no name).
-function artist(method::String, name::String, options::Dict)
+function artist(method::String, options::Dict)
     q = buildQuery("artist", method, options)
+    r = JSON.parse(IOBuffer(Requests.get(q).data))["response"]
+    println(r["status"]["message"])
+    return r 
+end
+
+# artist id base method (query method, id, options dicitonary)
+function artist(method::String, id::String, options::Dict)
+    q = buildQuery("artist", method, id, options)
+    r = JSON.parse(IOBuffer(Requests.get(q).data))["response"]
+    println(r["status"]["message"])
+    return r
+end
+
+# artist id method for passing only a query method and name (no options).
+function artist(method::String, id::String)
+    q = buildQuery("artist", method, id)
     r = JSON.parse(IOBuffer(Requests.get(q).data))["response"]
     println(r["status"]["message"])
     return r 
@@ -183,5 +282,20 @@ function song(method::String, title::String, options::Dict)
     println(r["status"]["message"])
     return r
 end
+
+function song(method::String, id::String, options::Dict)
+    q = buildQuerySongs("song", method, id, options)
+    r = JSON.parse(IOBuffer(Requests.get(q).data))["response"]
+    println(r["status"]["message"])
+    return r
+end
+
+function song(method::String, id::String)
+    q = buildQuerySongs("song", method, id)
+    r = JSON.parse(IOBuffer(Requests.get(q).data))["response"]
+    println(r["status"]["message"])
+    return r
+end
+
 
 end     # module end
