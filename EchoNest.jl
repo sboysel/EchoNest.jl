@@ -4,8 +4,8 @@ using Requests
 using JSON
 using DataStructures
 
-export getartistid, getsessioninfo, setAPIkey, artist, 
-        genre, song, playlist, getdocs
+export getartistid, getsongid, getsessioninfo, setAPIkey, artist, 
+        genre, song, songsearch, playlist, getdocs
 
 ### BEGIN CONF ###
 # Eventually move conf info to conf.jl:
@@ -43,6 +43,11 @@ function getartistid(name::String)
     return r["artist"]["id"]
 end
 
+function getsongid(title::String)
+    r = song("profile", title)
+    return r["songs"]
+end
+
 function sortDict(d::Dict)
     o = OrderedDict
     for i in sort(collect(keys(d)))
@@ -64,8 +69,17 @@ function setAPIkey(key::String)
     end
 end
 
-function getsessioninfo()
-    return sortDict(Requests.get(buildQuery("artist", "songs", "")).headers)
+function getsessioninfo(rate_limit_only::Bool)
+    info = Requests.get(buildQuery("artist", "profile", randstring(5))).headers
+    if rate_limit_only
+        rates = OrderedDict()
+        rates["API Key"] = info["X-Api-Key"]
+        rates["Limit"] = int(info["X-Ratelimit-Limit"])
+        rates["Reamining"] = int(info["X-Ratelimit-Remaining"])
+        return rates
+    else
+        return info
+    end
 end
 
 function getdocs(api::String, method::String)
@@ -159,7 +173,8 @@ function buildQueryArtist(api::String, method::String, id::String, options::Dict
 end
 
 # buildQuerySongs base method
-function buildQuerySongs(api::String, method::String, title::String, options::Dict)
+
+function buildQuerySongsTitle(api::String, method::String, title::String, options::Dict)
     if api in(keys(METHODS_DICT)) == false
         error("api must be artist, genre, song, or track")
     end
@@ -174,8 +189,19 @@ function buildQuerySongs(api::String, method::String, title::String, options::Di
     return BASE_URL * api * "/" * method * "?api_key=" * API_KEY * title * opts 
 end
 
+function buildQuerySongsName(api::String, method::String, title::String)
+    if api in(keys(METHODS_DICT)) == false
+        error("api must be artist, genre, song, or track")
+    end
+    if method in(METHODS_DICT[api]) == false
+        error("method must be one of the following: ", METHODS_DICT[api])
+    end
+    title = "&title=" * replace(title, " ", "+")
+    return BASE_URL * api * "/" * method * "?api_key=" * API_KEY * title 
+end
+
 # buildQuerySongs id method
-function buildQuerySongs(api::String, method::String, id::String, options::Dict)
+function buildQuerySongsID(api::String, method::String, id::String, options::Dict)
     if api in(keys(METHODS_DICT)) == false
         error("api must be artist, genre, song, or track")
     end
@@ -191,7 +217,7 @@ function buildQuerySongs(api::String, method::String, id::String, options::Dict)
 end
 
 # buildQuerySongs id method (no options dictionary)
-function buildQuerySongs(api::String, method::String, id::String)
+function buildQuerySongsID(api::String, method::String, id::String)
     if api in(keys(METHODS_DICT)) == false
         error("api must be artist, genre, song, or track")
     end
@@ -323,23 +349,40 @@ function genre(method::String, options::Dict)
     return r
 end
 
-# song base method (query method, name, options dicitonary)
-function song(method::String, title::String, options::Dict)
-    q = buildQuerySongs("song", method, title, options)
+# songsearch base method (query method, name, options dicitonary)
+function songsearch(name::String, options::Dict)
+    q = buildQuerySongsName("song", "search", name, options)
     r = JSON.parse(IOBuffer(Requests.get(q).data))["response"]
     println(r["status"]["message"])
     return r
 end
 
-function song(method::String, id::String, options::Dict)
-    q = buildQuerySongs("song", method, id, options)
+function songsearch(name::String)
+    q = buildQuerySongsName("song", "search", name)
     r = JSON.parse(IOBuffer(Requests.get(q).data))["response"]
     println(r["status"]["message"])
     return r
 end
+
+# song by song by song id
+function song(method::String, id::String, options::Dict)
+    q = buildQuerySongsID("song", method, id, options)
+    r = JSON.parse(IOBuffer(Requests.get(q).data))["response"]
+    println(r["status"]["message"])
+    return r
+end
+
+#=
+ =function songname(method::String, name::String)
+ =    q = buildQuerySongsName("song", method, name)
+ =    r = JSON.parse(IOBuffer(Requests.get(q).data))["response"]
+ =    println(r["status"]["message"])
+ =    return r
+ =end
+ =#
 
 function song(method::String, id::String)
-    q = buildQuerySongs("song", method, id)
+    q = buildQuerySongsID("song", method, id)
     r = JSON.parse(IOBuffer(Requests.get(q).data))["response"]
     println(r["status"]["message"])
     return r
