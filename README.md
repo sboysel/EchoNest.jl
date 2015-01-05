@@ -6,6 +6,7 @@
     * [Genre API Methods](http://developer.echonest.com/docs/v4/genre.html)
     * [Song API Methods](http://developer.echonest.com/docs/v4/song.html)
     * [Track API Methods](http://developer.echonest.com/docs/v4/track.html)
+    * [Playlisting API Methods](http://developer.echonest.com/docs/v4/basic.html)
 * [Julia Methods
   Documentation](http://julia.readthedocs.org/en/latest/manual/methods/)
 * [Julia Packages](http://julia.readthedocs.org/en/latest/manual/packages/#package-development)
