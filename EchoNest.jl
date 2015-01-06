@@ -229,51 +229,61 @@ function buildQuerySongsID(api::String, method::String, id::String)
 end
 
 # buildQueryPlaylist artist_name method
-function buildQueryPlaylist(api::String, method::String, artist_name::String, options::Dict)
-    if api in(keys(METHODS_DICT)) == false
-        error("api must be artist, genre, song, playlist, or track")
+function buildQueryPlaylist(api::String, method::String, base::String, input::String, options::Dict)
+    #if api in(keys(METHODS_DICT)) == false
+    #    error("api must be artist, genre, song, playlist, or track")
+    #end
+    #if method in(METHODS_DICT[api]) == false
+    #    error("method must be one of the following: ", METHODS_DICT[api])
+    #end
+    if base == "artist"
+        input = "&name=" * replace(input, " ", "+") * "&type" * base * "-radio"
+    elseif base == "song"
+        input = "&song_id=" * replace(input, " ", "+") * "&type" * base * "-radio"
+    elseif base == "genre"
+        input = "&genre=" * replace(input, " ", "+") * "&type" * base * "-radio"
+    else
+        error("base_type must be artist, genre, or song")
     end
-    if method in(METHODS_DICT[api]) == false
-        error("method must be one of the following: ", METHODS_DICT[api])
-    end
-    name = "&name=" * replace(artist_name, " ", "+")
     opts = ""
     for key in keys(options)
        opts = opts * "&" * string(key) * "=" * string(options[key])
     end
-    return BASE_URL * api * "/" * method * "?api_key=" * API_KEY * name * opts 
+    return BASE_URL * api * "/" * method * "?api_key=" * API_KEY * input * opts 
 end
 
-# buildQueryPlaylist song_id method
-function buildQueryPlaylist(api::String, method::String, song_id::String, options::Dict)
-    if api in(keys(METHODS_DICT)) == false
-        error("api must be artist, genre, song, playlist, or track")
-    end
-    if method in(METHODS_DICT[api]) == false
-        error("method must be one of the following: ", METHODS_DICT[api])
-    end
-    opts = ""
-    for key in keys(options)
-       opts = opts * "&" * string(key) * "=" * string(options[key])
-    end
-    return BASE_URL * api * "/" * method * "?api_key=" * API_KEY * song_id * opts 
-end
-
-# buildQueryPlaylist genre method
-function buildQueryPlaylist(api::String, method::String, genre::String, options::Dict)
-    if api in(keys(METHODS_DICT)) == false
-        error("api must be artist, genre, song, playlist, or track")
-    end
-    if method in(METHODS_DICT[api]) == false
-        error("method must be one of the following: ", METHODS_DICT[api])
-    end
-    genre = "&genre=" * replace(genre, " ", "+")
-    opts = ""
-    for key in keys(options)
-       opts = opts * "&" * string(key) * "=" * string(options[key])
-    end
-    return BASE_URL * api * "/" * method * "?api_key=" * API_KEY * song_id * opts 
-end
+#=
+ =buildQueryPlaylist song_id method
+ =function buildQueryPlaylist(api::String, method::String, song_id::String, options::Dict)
+ =    if api in(keys(METHODS_DICT)) == false
+ =        error("api must be artist, genre, song, playlist, or track")
+ =    end
+ =    if method in(METHODS_DICT[api]) == false
+ =        error("method must be one of the following: ", METHODS_DICT[api])
+ =    end
+ =    opts = ""
+ =    for key in keys(options)
+ =       opts = opts * "&" * string(key) * "=" * string(options[key])
+ =    end
+ =    return BASE_URL * api * "/" * method * "?api_key=" * API_KEY * song_id * opts 
+ =end
+ =
+ =buildQueryPlaylist genre method
+ =function buildQueryPlaylist(api::String, method::String, genre::String, options::Dict)
+ =    if api in(keys(METHODS_DICT)) == false
+ =        error("api must be artist, genre, song, playlist, or track")
+ =    end
+ =    if method in(METHODS_DICT[api]) == false
+ =        error("method must be one of the following: ", METHODS_DICT[api])
+ =    end
+ =    genre = "&genre=" * replace(genre, " ", "+")
+ =    opts = ""
+ =    for key in keys(options)
+ =       opts = opts * "&" * string(key) * "=" * string(options[key])
+ =    end
+ =    return BASE_URL * api * "/" * method * "?api_key=" * API_KEY * song_id * opts 
+ =end
+ =#
 
 ### API functions (artist, genre, songs, track, playlist) ###
 
@@ -388,28 +398,30 @@ function song(method::String, id::String)
     return r
 end
 
-# basic playlist by artist name
-function playlist(method::String, artist_name::String, options::Dict)
-    q = buildQueryPlaylist("playlist", method, artist_name, options)
+# basic playlist
+function playlist(base::String, input::String, options::Dict)
+    q = buildQueryPlaylist("playlist", "basic", base , input, options)
     r = JSON.parse(IOBuffer(Requests.get(q).data))["response"]
     println(r["status"]["message"])
     return r
 end
 
-# basic playlist by song id 
-function playlist(method::String, song_id::String, options::Dict)
-    q = buildQueryPlaylist("playlist", method, song_id, options)
-    r = JSON.parse(IOBuffer(Requests.get(q).data))["response"]
-    println(r["status"]["message"])
-    return r
-end
-
-# basic playlist by genre 
-function playlist(method::String, genre::String, options::Dict)
-    q = buildQueryPlaylist("playlist", method, genre, options)
-    r = JSON.parse(IOBuffer(Requests.get(q).data))["response"]
-    println(r["status"]["message"])
-    return r
-end
+#=
+ =basic playlist by song id 
+ =function playlist(method::String, song_id::String, options::Dict)
+ =    q = buildQueryPlaylist("playlist", method, song_id, options)
+ =    r = JSON.parse(IOBuffer(Requests.get(q).data))["response"]
+ =    println(r["status"]["message"])
+ =    return r
+ =end
+ =
+ =basic playlist by genre 
+ =function playlist(method::String, genre::String, options::Dict)
+ =    q = buildQueryPlaylist("playlist", method, genre, options)
+ =    r = JSON.parse(IOBuffer(Requests.get(q).data))["response"]
+ =    println(r["status"]["message"])
+ =    return r
+ =end
+ =#
 
 end     # module end
