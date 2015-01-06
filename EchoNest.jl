@@ -82,7 +82,7 @@ function getsessioninfo(rate_limit_only::Bool)
     end
 end
 
-function getdocs(api::String, method::String)
+function getdocs(api::String, method::String; browser=true::Bool)
     BASE_URL_DOC = "http://developer.echonest.com/docs/v4/"
     if api == "overview"
         error("Overview API documentation includes no specific query methods.")
@@ -113,7 +113,13 @@ function buildQuery(api::String, method::String, name::String, options::Dict)
     name = "&name=" * replace(name, " ", "+")
     opts = ""
     for key in keys(options)
-       opts = opts * "&" * string(key) * "=" * string(options[key])
+        if key == "bucket"
+            for elem in options[key]
+                opts = opts * "&bucket=" * string(elem)
+            end
+        else
+        opts = opts * "&" * string(key) * "=" * string(options[key])
+        end
     end
     return BASE_URL * api * "/" * method * "?api_key=" * API_KEY * name * opts 
 end
@@ -151,7 +157,13 @@ function buildQuery(api::String, method::String, options::Dict)
     end
     opts = ""
     for key in keys(options)
-       opts = opts * "&" * string(key) * "=" * string(options[key])
+        if key == "bucket"
+            for elem in options[key]
+                opts = opts * "&bucket=" * string(elem)
+            end
+        else
+        opts = opts * "&" * string(key) * "=" * string(options[key])
+        end
     end
     return BASE_URL * api * "/" * method * "?api_key=" * API_KEY * opts 
 end
@@ -167,7 +179,13 @@ function buildQueryArtist(api::String, method::String, id::String, options::Dict
     id = "&id=" * replace(id, " ", "+")
     opts = ""
     for key in keys(options)
-       opts = opts * "&" * string(key) * "=" * string(options[key])
+        if key == "bucket"
+            for elem in options[key]
+                opts = opts * "&bucket=" * string(elem)
+            end
+        else
+        opts = opts * "&" * string(key) * "=" * string(options[key])
+        end
     end
     return BASE_URL * api * "/" * method * "?api_key=" * API_KEY * id * opts 
 end
@@ -184,7 +202,13 @@ function buildQuerySongsTitle(api::String, method::String, title::String, option
     title = "&title=" * replace(title, " ", "+")
     opts = ""
     for key in keys(options)
-       opts = opts * "&" * string(key) * "=" * string(options[key])
+        if key == "bucket"
+            for elem in options[key]
+                opts = opts * "&bucket=" * string(elem)
+            end
+        else
+        opts = opts * "&" * string(key) * "=" * string(options[key])
+        end
     end
     return BASE_URL * api * "/" * method * "?api_key=" * API_KEY * title * opts 
 end
@@ -210,8 +234,14 @@ function buildQuerySongsID(api::String, method::String, id::String, options::Dic
     end
     id = "&id=" * replace(id, " ", "+")
     opts = ""
-    for key in keys(options)
-       opts = opts * "&" * string(key) * "=" * string(options[key])
+     for key in keys(options)
+        if key == "bucket"
+            for elem in options[key]
+                opts = opts * "&bucket=" * string(elem)
+            end
+        else
+        opts = opts * "&" * string(key) * "=" * string(options[key])
+        end
     end
     return BASE_URL * api * "/" * method * "?api_key=" * API_KEY * id * opts 
 end
@@ -247,7 +277,13 @@ function buildQueryPlaylist(api::String, method::String, base::String, input::St
     end
     opts = ""
     for key in keys(options)
-       opts = opts * "&" * string(key) * "=" * string(options[key])
+        if key == "bucket"
+            for elem in options[key]
+                opts = opts * "&bucket=" * string(elem)
+            end
+        else
+        opts = opts * "&" * string(key) * "=" * string(options[key])
+        end
     end
     return BASE_URL * api * "/" * method * "?api_key=" * API_KEY * input * opts 
 end
