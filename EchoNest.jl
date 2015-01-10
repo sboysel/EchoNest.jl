@@ -39,8 +39,8 @@ function getsongid(title::String)
     return r["songs"]
 end
 
-function sortDict(d::Dict)
-    o = OrderedDict
+function sort_dict(d::Dict)
+    o = OrderedDict()
     for i in sort(collect(keys(d)))
         o[i] = d[i]
     end
@@ -93,8 +93,10 @@ function getdocs(api::String)
     end
 end
 
+### BUILDQUERY ###
+
 # buildQuery base method
-function buildQuery(api::String, method::String, name::String, options::Dict)
+function build_query(api::String, method::String, name::String, options::Dict)
     if api in(keys(METHODS_DICT)) == false
         error("api must be artist, genre, song, or track")
     end
@@ -116,7 +118,7 @@ function buildQuery(api::String, method::String, name::String, options::Dict)
 end
 
 # buildQuery method for passing a method and a name (no options).
-function buildQuery(api::String, method::String, name::String)
+function build_query(api::String, method::String, name::String)
     if api in(keys(METHODS_DICT)) == false
         error("api must be artist, genre, song, or track")
     end
@@ -128,7 +130,7 @@ function buildQuery(api::String, method::String, name::String)
 end
 
 # buildQuery method for passing only a method (no options, no name).
-function buildQuery(api::String, method::String)
+function build_query(api::String, method::String)
     if api in(keys(METHODS_DICT)) == false
         error("api must be artist, genre, song, or track")
     end
@@ -139,7 +141,7 @@ function buildQuery(api::String, method::String)
 end
 
 # buildQuery method for passing a moethod and options (no name) 
-function buildQuery(api::String, method::String, options::Dict)
+function build_query(api::String, method::String, options::Dict)
     if api in(keys(METHODS_DICT)) == false
         error("api must be artist, genre, song, or track")
     end
@@ -160,7 +162,7 @@ function buildQuery(api::String, method::String, options::Dict)
 end
 
 # buildQueryArtist id method
-function buildQueryArtist(api::String, method::String, id::String, options::Dict)
+function build_query_artist(api::String, method::String, id::String, options::Dict)
     if api in(keys(METHODS_DICT)) == false
         error("api must be artist, genre, song, or track")
     end
@@ -182,7 +184,7 @@ function buildQueryArtist(api::String, method::String, id::String, options::Dict
 end
 
 # buildQuerySongs
-function buildQuerySongsTitle(api::String, method::String, title::String, options::Dict)
+function build_query_songs_title(api::String, method::String, title::String, options::Dict)
     if api in(keys(METHODS_DICT)) == false
         error("api must be artist, genre, song, or track")
     end
@@ -203,7 +205,7 @@ function buildQuerySongsTitle(api::String, method::String, title::String, option
     return BASE_URL * api * "/" * method * "?api_key=" * API_KEY * title * opts 
 end
 
-function buildQuerySongsName(api::String, method::String, title::String)
+function build_query_songs_name(api::String, method::String, title::String)
     if api in(keys(METHODS_DICT)) == false
         error("api must be artist, genre, song, or track")
     end
@@ -215,7 +217,7 @@ function buildQuerySongsName(api::String, method::String, title::String)
 end
 
 # buildQueryID
-function buildQueryID(api::String, method::String, id::String, options::Dict)
+function build_query_id(api::String, method::String, id::String, options::Dict)
     if api in(keys(METHODS_DICT)) == false
         error("api must be artist, genre, song, or track")
     end
@@ -237,7 +239,7 @@ function buildQueryID(api::String, method::String, id::String, options::Dict)
 end
 
 # buildQueryID method (no options dictionary)
-function buildQueryID(api::String, method::String, id::String)
+function build_query_id(api::String, method::String, id::String)
     if api in(keys(METHODS_DICT)) == false
         error("api must be artist, genre, song, or track")
     end
@@ -249,13 +251,7 @@ function buildQueryID(api::String, method::String, id::String)
 end
 
 # buildQueryPlaylist artist_name method
-function buildQueryPlaylist(api::String, method::String, base::String, input::String, options::Dict)
-    #if api in(keys(METHODS_DICT)) == false
-    #    error("api must be artist, genre, song, playlist, or track")
-    #end
-    #if method in(METHODS_DICT[api]) == false
-    #    error("method must be one of the following: ", METHODS_DICT[api])
-    #end
+function build_query_playlist(api::String, method::String, base::String, input::String, options::Dict)
     if base == "artist"
         input = "&name=" * replace(input, " ", "+") * "&type" * base * "-radio"
     elseif base == "song"
@@ -278,46 +274,13 @@ function buildQueryPlaylist(api::String, method::String, base::String, input::St
     return BASE_URL * api * "/" * method * "?api_key=" * API_KEY * input * opts 
 end
 
-#=
- =buildQueryPlaylist song_id method
- =function buildQueryPlaylist(api::String, method::String, song_id::String, options::Dict)
- =    if api in(keys(METHODS_DICT)) == false
- =        error("api must be artist, genre, song, playlist, or track")
- =    end
- =    if method in(METHODS_DICT[api]) == false
- =        error("method must be one of the following: ", METHODS_DICT[api])
- =    end
- =    opts = ""
- =    for key in keys(options)
- =       opts = opts * "&" * string(key) * "=" * string(options[key])
- =    end
- =    return BASE_URL * api * "/" * method * "?api_key=" * API_KEY * song_id * opts 
- =end
- =
- =buildQueryPlaylist genre method
- =function buildQueryPlaylist(api::String, method::String, genre::String, options::Dict)
- =    if api in(keys(METHODS_DICT)) == false
- =        error("api must be artist, genre, song, playlist, or track")
- =    end
- =    if method in(METHODS_DICT[api]) == false
- =        error("method must be one of the following: ", METHODS_DICT[api])
- =    end
- =    genre = "&genre=" * replace(genre, " ", "+")
- =    opts = ""
- =    for key in keys(options)
- =       opts = opts * "&" * string(key) * "=" * string(options[key])
- =    end
- =    return BASE_URL * api * "/" * method * "?api_key=" * API_KEY * song_id * opts 
- =end
- =#
-
 ### API functions (artist, genre, songs, track, playlist) ###
 
 ## ARTIST ##
 
 # artist base method (query method, name, options dicitonary)
 function artist(method::String, name::String, options::Dict)
-    q = buildQuery("artist", method, name, options)
+    q = build_query("artist", method, name, options)
     r = JSON.parse(IOBuffer(Requests.get(q).data))["response"]
     println(r["status"]["message"])
     return r
@@ -325,7 +288,7 @@ end
 
 # artist method for passing only a query method and name (no options).
 function artist(method::String, name::String)
-    q = buildQuery("artist", method, name)
+    q = build_query("artist", method, name)
     r = JSON.parse(IOBuffer(Requests.get(q).data))["response"]
     println(r["status"]["message"])
     return r 
@@ -333,7 +296,7 @@ end
 
 # artist method for passing only a query method (no options, no name).
 function artist(method::String)
-    q = buildQuery("artist", method)
+    q = build_query("artist", method)
     r = JSON.parse(IOBuffer(Requests.get(q).data))["response"]
     println(r["status"]["message"])
     return r 
@@ -341,7 +304,7 @@ end
 
 # artist method for passing a method with options (no name).
 function artist(method::String, options::Dict)
-    q = buildQuery("artist", method, options)
+    q = build_query("artist", method, options)
     r = JSON.parse(IOBuffer(Requests.get(q).data))["response"]
     println(r["status"]["message"])
     return r 
@@ -349,7 +312,7 @@ end
 
 # artist id base method (query method, id, options dicitonary)
 function artist(method::String, id::String, options::Dict)
-    q = buildQuery("artist", method, id, options)
+    q = build_query("artist", method, id, options)
     r = JSON.parse(IOBuffer(Requests.get(q).data))["response"]
     println(r["status"]["message"])
     return r
@@ -357,7 +320,7 @@ end
 
 # artist id method for passing only a query method and name (no options).
 function artist(method::String, id::String)
-    q = buildQuery("artist", method, id)
+    q = build_query("artist", method, id)
     r = JSON.parse(IOBuffer(Requests.get(q).data))["response"]
     println(r["status"]["message"])
     return r 
@@ -367,7 +330,7 @@ end
 
 # genre base method (query method, name, options dicitonary)
 function genre(method::String, name::String, options::Dict)
-    q = buildQuery("genre", method, name, options)
+    q = build_query("genre", method, name, options)
     r = JSON.parse(IOBuffer(Requests.get(q).data))["response"]
     println(r["status"]["message"])
     return r
@@ -375,7 +338,7 @@ end
 
 # genre method for passing without options (query method, name)
 function genre(method::String, name::String)
-    q = buildQuery("genre", method, name)
+    q = build_query("genre", method, name)
     r = JSON.parse(IOBuffer(Requests.get(q).data))["response"]
     println(r["status"]["message"])
     return r
@@ -383,7 +346,15 @@ end
 
 # genre method for passing without a name (query method, options)
 function genre(method::String, options::Dict)
-    q = buildQuery("genre", method, options)
+    q = build_query("genre", method, options)
+    r = JSON.parse(IOBuffer(Requests.get(q).data))["response"]
+    println(r["status"]["message"])
+    return r
+end
+
+# genre method for passing only a method (i.e. genre("list"))
+function genre(method::String)
+    q = build_query("genre", method)
     r = JSON.parse(IOBuffer(Requests.get(q).data))["response"]
     println(r["status"]["message"])
     return r
@@ -393,7 +364,7 @@ end
 
 # songsearch base method (query method, name, options dicitonary)
 function songsearch(name::String, options::Dict)
-    q = buildQuerySongsName("song", "search", name, options)
+    q = build_query_songs_name("song", "search", name, options)
     r = JSON.parse(IOBuffer(Requests.get(q).data))["response"]
     println(r["status"]["message"])
     return r
@@ -401,7 +372,7 @@ end
 
 # songsearch (no options)
 function songsearch(name::String)
-    q = buildQuerySongsName("song", "search", name)
+    q = build_query_songs_name("song", "search", name)
     r = JSON.parse(IOBuffer(Requests.get(q).data))["response"]
     println(r["status"]["message"])
     return r
@@ -409,7 +380,7 @@ end
 
 # song by song id
 function song(method::String, id::String, options::Dict)
-    q = buildQueryID("song", method, id, options)
+    q = build_query_id("song", method, id, options)
     r = JSON.parse(IOBuffer(Requests.get(q).data))["response"]
     println(r["status"]["message"])
     return r
@@ -417,7 +388,7 @@ end
 
 # song by song id (no options dicitonary)
 function song(method::String, id::String)
-    q = buildQueryID("song", method, id)
+    q = build_query_id("song", method, id)
     r = JSON.parse(IOBuffer(Requests.get(q).data))["response"]
     println(r["status"]["message"])
     return r
@@ -427,7 +398,7 @@ end
 
 # base track method
 function track(id::String, options::Dict; method = "profile"::String)
-    q = buildQueryID("song", method, id, options)
+    q = build_query_id("song", method, id, options)
     r = JSON.parse(IOBuffer(Requests.get(q).data))["response"]
     println(r["status"]["message"])
     return r
@@ -437,7 +408,7 @@ end
 
 # basic playlist
 function playlist(base::String, input::String, options::Dict)
-    q = buildQueryPlaylist("playlist", "basic", base , input, options)
+    q = build_query_playlist("playlist", "basic", base , input, options)
     r = JSON.parse(IOBuffer(Requests.get(q).data))["response"]
     println(r["status"]["message"])
     return r
