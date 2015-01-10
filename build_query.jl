@@ -140,7 +140,7 @@ function build_query_songs_title_artist(api::String, method::String, title::Stri
             opts = opts * "&" * string(key) * "=" * string(options[key])
         end
     end
-    return BASE_URL * api * "/" * method * "?api_key=" * ECHO_NEST_API_KEY * title * artist *opts 
+    return BASE_URL * api * "/" * method * "?api_key=" * ECHO_NEST_API_KEY * title * artist * opts 
 end
 
 function build_query_songs_title_artist(api::String, method::String, title::String, artist::String)
@@ -151,7 +151,7 @@ function build_query_songs_title_artist(api::String, method::String, title::Stri
         error("method must be one of the following: ", METHODS_DICT[api])
     end
     title = "&title=" * replace(title, " ", "+")
-    artist = "&artist=" * replace(title, " ", "+")
+    artist = "&artist=" * replace(artist, " ", "+")
     return BASE_URL * api * "/" * method * "?api_key=" * ECHO_NEST_API_KEY * title * artist 
 end
 
