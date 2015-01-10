@@ -5,8 +5,8 @@ function getartistid(name::String)
     return r["artist"]["id"]
 end
 
-function getsongid(title::String; first_match = true::Bool)
-    r = songsearch("profile")
+function getsongid(title::String, artist::String; first_match = true::Bool)
+    r = songsearch(title, artist)
     if first_match
         return r["songs"][1]["id"]
     else
@@ -14,8 +14,8 @@ function getsongid(title::String; first_match = true::Bool)
     end
 end
 
-function audio_summary(id::String; first_match = true::Bool)
-    song_id = songsearch(id; first_match)
+function audio_summary(title::String, artist::String; first_match = true::Bool)
+    song_id = getsongid(title, artist; first_match)
     r = song("profile", song_id, Dict("bucket" => "audio_summary"))
     return r["songs"][1]
 end
