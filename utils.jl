@@ -21,14 +21,6 @@ function audio_summary(title::String, artist::String)
     return r["songs"][1]
 end
 
-function sort_dict(d::Dict)
-    o = OrderedDict()
-    for i in sort(collect(keys(d)))
-        o[i] = d[i]
-    end
-    return o
-end
-
 function setapikey(key::String)
     global ECHO_NEST_API_KEY = key
 end
