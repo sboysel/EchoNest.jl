@@ -14,8 +14,9 @@ function getsongid(title::String, artist::String; first_match = true::Bool)
     end
 end
 
-function audio_summary(title::String, artist::String; first_match = true::Bool)
-    song_id = getsongid(title, artist; first_match)
+# is there a way to do this with only one call?
+function audio_summary(title::String, artist::String)
+    song_id = getsongid(title, artist; first_match = true)
     r = song("profile", song_id, Dict("bucket" => "audio_summary"))
     return r["songs"][1]
 end
