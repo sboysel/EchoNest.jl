@@ -192,11 +192,11 @@ end
 # buildQueryPlaylist artist_name method
 function build_query_playlist(api::String, method::String, base::String, input::String, options::Dict)
     if base == "artist"
-        input = "&name=" * replace(input, " ", "+") * "&type" * base * "-radio"
+        input = "&artist=" * replace(input, " ", "+") * "&type=" * base * "-radio"
     elseif base == "song"
-        input = "&song_id=" * replace(input, " ", "+") * "&type" * base * "-radio"
+        input = "&song_id=" * replace(input, " ", "+") * "&type=" * base * "-radio"
     elseif base == "genre"
-        input = "&genre=" * replace(input, " ", "+") * "&type" * base * "-radio"
+        input = "&genre=" * replace(input, " ", "+") * "&type=" * base * "-radio"
     else
         error("base_type must be artist, genre, or song")
     end
@@ -211,5 +211,19 @@ function build_query_playlist(api::String, method::String, base::String, input::
         end
     end
     return BASE_URL * api * "/" * method * "?api_key=" * ECHO_NEST_API_KEY * input * opts 
+end
+
+# buildQueryPlaylist artist_name method (no options dictionary)
+function build_query_playlist(api::String, method::String, base::String, input::String)
+    if base == "artist"
+        input = "&artist=" * replace(input, " ", "+") * "&type=" * base * "-radio"
+    elseif base == "song"
+        input = "&song_id=" * replace(input, " ", "+") * "&type=" * base * "-radio"
+    elseif base == "genre"
+        input = "&genre=" * replace(input, " ", "+") * "&type=" * base * "-radio"
+    else
+        error("base_type must be artist, genre, or song")
+    end
+    return BASE_URL * api * "/" * method * "?api_key=" * ECHO_NEST_API_KEY * input
 end
 

@@ -4,8 +4,7 @@ using Requests
 using JSON
 using DataStructures
 
-export audio_summary, getartistid, getsongid, getsessioninfo, setAPIkey, artist, 
-        genre, song, songsearch, playlist, track, getdocs
+export audio_summary, getartistid, getsongid, getsessioninfo, setAPIkey, artist, genre, song, songsearch, playlist, track, getdocs
 
 include("conf.jl")
 include("utils.jl")
